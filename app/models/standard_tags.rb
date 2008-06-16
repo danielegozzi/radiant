@@ -455,7 +455,7 @@ module StandardTags
       if snippet = Snippet.find_by_name(name.strip)
         tag.globals.page.render_snippet(snippet)
       else
-        raise TagError.new('snippet not found')
+        raise TagError.new('snippet not found (#{name.strip})')
       end
     else
       raise TagError.new("`snippet' tag must contain `name' attribute")
