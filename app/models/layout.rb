@@ -7,6 +7,7 @@ class Layout < ActiveRecord::Base
   has_many :pages
   belongs_to :created_by, :class_name => 'User'
   belongs_to :updated_by, :class_name => 'User'
+  belongs_to :inner_layout, :class_name => 'Layout', :foreign_key => 'inherit_layout_id'
 
   # Validations
   validates_presence_of :name, :message => 'required'

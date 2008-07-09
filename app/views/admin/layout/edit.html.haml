@@ -22,6 +22,11 @@
                     %label{:for=>"layout_content_type"} Content&#8209;Type
                   %td.field
                     = text_field 'layout', 'content_type', :maxlength => 40, :class => "textbox"
+                %tr
+                  %th.label
+                    %label{:for=>"layout_inherit_layout_id"} Layout for inner pages
+                  %td.field
+                    = select 'layout', 'inherit_layout_id', [['<none>', nil]] + Layout.find(:all).collect{|l| [l.name, l.id]}
                 = render_region :extended_metadata
             %p.more-or-less
               %small
