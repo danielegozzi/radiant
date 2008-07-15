@@ -38,8 +38,7 @@ class Page < ActiveRecord::Base
   
   def layout_with_inheritance
     unless layout_without_inheritance
-      if parent?
-        parent_layout = parent.layout 
+      if parent? && parent_layout = parent.layout 
         parent_layout.inner_layout || parent_layout
       end
     else

@@ -116,6 +116,16 @@ describe Page, "layout" do
     @page.layout_id.should == nil
     @page.layout.should == @page.parent.layout
   end
+
+  it 'should inherit a different layout if specified in the layout attributes' do
+    @page = pages(:inherited_layout)
+    parent_layout = @page.parent.layout
+    parent_layout.inner_layout = layouts(:utf8)
+    parent_layout.save!
+    @page.parent.layout.name.should == "Main"
+    @page.layout_id.should == nil
+    @page.layout.name.should == "UTF8"
+  end
 end
 
 describe Page do
