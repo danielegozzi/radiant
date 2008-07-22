@@ -150,27 +150,25 @@ class Page < ActiveRecord::Base
         found = slug_child.find_by_url(url, live, clean)
         return found if found
       end
-      children.each do |child|
-        found = child.find_by_url(url, live, clean)
-        return found if found
-      end
       file_not_found_types = [FileNotFoundPage] + FileNotFoundPage.descendants
       condition = (['class_name = ?'] * file_not_found_types.length).join(' or ')
       file_not_found_names = file_not_found_types.map { |x| x.name }.uniq
       children.find(:first, :conditions => [condition] + file_not_found_names)
+    else
+      return nil
     end
   end
   
   class << self
     def find_by_url(url, live = true)
-      root = find_by_parent_id(nil)
+      root = Page.root
       raise MissingRootPageError unless root
       root.find_by_url(url, live)
     end
     
     def display_name(string = nil)
       if string
-        @dislay_name = string
+        @display_name = string
       else
         @display_name ||= begin
           n = name.to_s

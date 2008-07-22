@@ -360,7 +360,7 @@ describe "Standard Tags" do
     end
 
     it "should render an error when the snippet does not exist" do
-      page.should render('<r:snippet name="non-existant" />').with_error('snippet not found')
+      page.should render('<r:snippet name="non-existant" />').with_error('snippet not found (non-existant)')
     end
 
     it "should render an error when not given a 'name' attribute" do

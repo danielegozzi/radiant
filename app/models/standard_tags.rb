@@ -781,6 +781,6 @@ module StandardTags
     end
     
     def page_found?(page)
-      page && !(FileNotFoundPage === page)
+      page && !(page.headers.values.any?{|v| v =~ /\A404 /})
     end
 end
