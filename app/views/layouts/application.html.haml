@@ -29,7 +29,7 @@
           #error
             %p= flash[:error]
         #content
-          = yield
+          = find_and_preserve(yield)
       %hr{:class=>"hidden"}/
       #footer
         %p 

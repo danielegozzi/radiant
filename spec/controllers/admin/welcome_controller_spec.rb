@@ -28,16 +28,42 @@ describe Admin::WelcomeController do
     flash[:error].should_not be_nil
   end
   
-  it "should clear the current user and redirect on logout" do
-    controller.should_receive(:current_user=).with(nil)
-    get :logout
-    response.should be_redirect
-    response.should redirect_to(login_url)
+  describe "remember me" do
+
+    before do
+      Radiant::Config.stub!(:[]).with('session_timeout').and_return(2.weeks)
+      @user = users(:admin)
+      controller.stub!(:current_user).and_return(@user)
+    end
+
+    after do
+      post :login, :user => {:login => "admin", :password => "password"}, :remember_me => 1
+    end
+
+    it "should remember user" do
+      @user.should_receive(:remember_me)
+    end
+
+    it "should set cookie" do
+      controller.should_receive(:set_session_cookie)
+    end
   end
 
   describe "with a logged-in user" do
     before do
       login_as :admin
+    end
+
+    it "should clear the current user and redirect on logout" do
+      controller.should_receive(:current_user=).with(nil)
+      get :logout
+      response.should be_redirect
+      response.should redirect_to(login_url)
+    end
+
+    it "should forget user on logout" do
+      controller.send(:current_user).should_receive(:forget_me)
+      get :logout
     end
 
     it "should not show /login again" do

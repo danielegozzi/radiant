@@ -275,32 +275,75 @@ module StandardTags
   end
   
   desc %{ 
-    Renders the containing elements only if the part exists on a page. By default the
-    @part@ attribute is set to @body@.
+    Renders the containing elements if all of the listed parts exist on a page.
+    By default the @part@ attribute is set to @body@, but you may list more than one
+    part by seprating them with a comma. Setting the optional @inherit@ to true will 
+    search ancestors independently for each part. By default @inherit@ is set to @false@.
+    
+    When listing more than one part, you may optionally set the @find@ attribute to @any@
+    so that it will render the containing elements if any of the listed parts are found.
+    By default the @find@ attribute is set to @all@.
     
     *Usage:*
-    <pre><code><r:if_content [part="part_name"]>...</r:if_content></code></pre>
+    <pre><code><r:if_content [part="part_name, other_part"] [inherit="true"] [find="any"]>...</r:if_content></code></pre>
   }
   tag 'if_content' do |tag|
     page = tag.locals.page
     part_name = tag_part_name(tag)
-    unless page.part(part_name).nil?
-      tag.expand
+    parts_arr = part_name.split(',')
+    inherit = boolean_attr_or_error(tag, 'inherit', 'false')
+    find = attr_or_error(tag, :attribute_name => 'find', :default => 'all', :values => 'any, all')
+    expandable = true
+    one_found = false
+    part_page = page
+    parts_arr.each do |name|
+      name.strip!
+      if inherit
+        while (part_page.part(name).nil? and (not part_page.parent.nil?)) do
+          part_page = part_page.parent
+        end
+      end
+      expandable = false if part_page.part(name).nil?
+      one_found ||= true if !part_page.part(name).nil?
     end
+    expandable = true if (find == 'any' and one_found)
+    tag.expand if expandable
   end
   
   desc %{
-    The opposite of the @if_content@ tag.
+    The opposite of the @if_content@ tag. It renders the contained elements if all of the 
+    specified parts do not exist. Setting the optional @inherit@ to true will search 
+    ancestors independently for each part. By default @inherit@ is set to @false@.
+    
+    When listing more than one part, you may optionally set the @find@ attribute to @any@
+    so that it will not render the containing elements if any of the listed parts are found.
+    By default the @find@ attribute is set to @all@.
     
     *Usage:*
-    <pre><code><r:unless_content [part="part_name"]>...</r:unless_content></code></pre>
+    <pre><code><r:unless_content [part="part_name, other_part"] [inherit="true"] [find="any"]>...</r:unless_content></code></pre>
   }
   tag 'unless_content' do |tag|
     page = tag.locals.page
     part_name = tag_part_name(tag)
-    if page.part(part_name).nil?
-      tag.expand
+    parts_arr = part_name.split(',')
+    inherit = boolean_attr_or_error(tag, 'inherit', true)
+    find = attr_or_error(tag, :attribute_name => 'find', :default => 'all', :values => 'any, all')
+    expandable, all_found = true, true
+    part_page = page
+    parts_arr.each do |name|
+      name.strip!
+      if inherit
+        while (part_page.part(name).nil? and (not part_page.parent.nil?)) do
+          part_page = part_page.parent
+        end
+      end
+      expandable = false if !part_page.part(name).nil?
+      all_found = false if part_page.part(name).nil?
     end
+    if all_found == false and find == 'all'
+      expandable = true
+    end
+    tag.expand if expandable
   end
   
   desc %{  
@@ -346,6 +389,18 @@ module StandardTags
   end
   
   desc %{
+    Renders the contained elements unless the current contextual page is either the actual page or one of its parents.
+    
+    This is typically used inside another tag (like &lt;r:children:each&gt;) to add conditional mark-up unless the child element is or descends from the current page.
+    
+    *Usage:*
+    <pre><code><r:unless_ancestor_or_self>...</unless_ancestor_or_self></code></pre>
+  }  
+  tag "unless_ancestor_or_self" do |tag|
+    tag.expand unless (tag.globals.page.ancestors + [tag.globals.page]).include?(tag.locals.page)
+  end
+  
+  desc %{
     Renders the contained elements if the current contextual page is also the actual page.
     
     This is typically used inside another tag (like &lt;r:children:each&gt;) to add conditional mark-up if the child element is the current page.
@@ -355,6 +410,18 @@ module StandardTags
   }
   tag "if_self" do |tag|
     tag.expand if tag.locals.page == tag.globals.page
+  end
+  
+  desc %{
+    Renders the contained elements unless the current contextual page is also the actual page.
+    
+    This is typically used inside another tag (like &lt;r:children:each&gt;) to add conditional mark-up unless the child element is the current page.
+    
+    *Usage:*
+    <pre><code><r:unless_self>...</unless_self></code></pre>
+  }
+  tag "unless_self" do |tag|
+    tag.expand unless tag.locals.page == tag.globals.page
   end
   
   desc %{
@@ -781,6 +848,21 @@ module StandardTags
     end
     
     def page_found?(page)
-      page && !(page.headers.values.any?{|v| v =~ /\A404 /})
+      page && ! page.headers['Status'] =~ /\A404 /
+    end
+    
+    def boolean_attr_or_error(tag, attribute_name, default)
+      attribute = attr_or_error(tag, :attribute_name => attribute_name, :default => default.to_s, :values => 'true, false')
+      (attribute.to_s.downcase == 'true') ? true : false
+    end
+    
+    def attr_or_error(tag, options = {})
+      attribute_name = options[:attribute_name].to_s
+      default = options[:default]
+      values = options[:values].split(',').map!(&:strip)
+      
+      attribute = (tag.attr[attribute_name] || default).to_s
+      raise TagError.new(%{'#{attribute_name}' attribute of #{tag} tag must be one of: #{values.join(',')}}) unless values.include?(attribute)
+      return attribute
     end
 end

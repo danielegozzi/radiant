@@ -121,6 +121,34 @@ describe User do
     @user.salt.should_not be_nil
     @user.password.should == @user.sha1('password')
   end
+
+  describe ".remember_me" do
+    before do
+      Radiant::Config.stub!(:[]).with('session_timeout').and_return(2.weeks)
+      @user.save
+      @user.remember_me
+      @user.reload
+    end
+
+    it "should remember user" do
+      @user.session_token.should_not be_nil
+    end
+  end
+
+  describe ".forget_me" do
+
+    before do
+      Radiant::Config.stub!(:[]).with('session_timeout').and_return(2.weeks)
+      @user.save
+      @user.remember_me
+    end
+
+    it "should forget user" do
+      @user.forget_me
+      @user.session_token.should be_nil
+    end
+  end
+  
 end
 
 describe User, "class methods" do

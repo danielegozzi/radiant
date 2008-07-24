@@ -1,6 +1,24 @@
 == Change Log
 
 === Edge
+* Add <r:unless_ancestor_or_self> and <r:unless_self> tags. [Tim Gossett]
+* Add specific installation modes for gzip and bzip2 compression. [Sean Cribbs]
+* Added extension installation scripts. [Sean Cribbs]
+* Added find attr to r:if_content and r:unless_content to expand based on
+finding 'any' or 'all' specified parts [Jim Gay]
+* Added inherit attr to r:if_content and r:unless_content to search for parts
+independently in the page tree. [Jim Gay]
+* Update radiant:freeze:edge task to use git and GitHub. [John Muhl]
+* Update login page layout from prototype. [Sean Cribbs]
+* Change order of extension paths to prefer project extensions over Radiant's.
+[John Muhl]
+* Switch default session store to cookies [Josh French]
+* Add remember-me function to login [Josh French]
+* Allow an inclusive list of parts in r:if_content and r:unless_content [Jim Gay]
+* Added a defaults.page.filter config setting for setting a default page
+filter. [Alex Wayne]
+* Fix Users fixtures for extensions that still use test/unit. [Nick Plante]
+* Don't search for missing Page subclasses before bootstrap. [Sean Cribbs]
 * Added tolerance for missing Page class definitions. [Loren Johnson]
 * Don't require an authenticity token check on the login action. [Sean Cribbs]
 * Make sure region sets are reloaded when activating extensions in development
@@ -12,11 +30,11 @@ mode. [Sean Cribbs]
 * Convert all views to Haml. [Sean Cribbs, John Long]
 * Avoid authenticity check when listing page children. [Sean Cribbs]
 * Add radiant:extensions:update_all task. [Josh French]
-* Tweak LoginSystem to allow attempted URL redirection after login and 
+* Tweak LoginSystem to allow attempted URL redirection after login and
 auto-redirect from login URL if logged in. [Josh French]
 * Add per-user salting to password encryption. [Sean Cribbs]
 * Address CSRF vulnerabilities in forms. [Sean Cribbs]
-* Remove clear cache action, always clear cache after saving a page. [Sean 
+* Remove clear cache action, always clear cache after saving a page. [Sean
 Cribbs]
 
 === 0.6.6 Chiseled

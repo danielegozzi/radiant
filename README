@@ -22,8 +22,9 @@ Radiant features:
 
 == License
 
-Radiant is released under the MIT license and is copyright (c) 2006 John W.
-Long. A copy of the MIT license can be found in the LICENSE file.
+Radiant is released under the MIT license and is copyright (c) 2006-2008
+John W. Long and Sean Cribbs. A copy of the MIT license can be found in the
+LICENSE file.
 
 
 == Installation and Setup
@@ -51,4 +52,5 @@ tickets.
 Enjoy!
 
 --
-John Long :: http://wiseheartdesign.com
+The Radiant Dev Team
+http://radiantcms.org

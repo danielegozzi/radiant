@@ -44,7 +44,15 @@ class User < ActiveRecord::Base
   def confirm_password?
     @confirm_password
   end
-  
+
+  def remember_me
+    update_attribute(:session_token, sha1(Time.now + Radiant::Config['session_timeout'].to_i)) unless self.session_token?
+  end
+
+  def forget_me
+    update_attribute(:session_token, nil)
+  end
+
   private
   
     def validate_length_of_password?
