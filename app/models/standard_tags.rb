@@ -326,7 +326,7 @@ module StandardTags
     page = tag.locals.page
     part_name = tag_part_name(tag)
     parts_arr = part_name.split(',')
-    inherit = boolean_attr_or_error(tag, 'inherit', true)
+    inherit = boolean_attr_or_error(tag, 'inherit', 'false')
     find = attr_or_error(tag, :attribute_name => 'find', :default => 'all', :values => 'any, all')
     expandable, all_found = true, true
     part_page = page
@@ -848,7 +848,7 @@ module StandardTags
     end
     
     def page_found?(page)
-      page && ! page.headers['Status'] =~ /\A404 /
+      page && (page.headers['Status'] =~ /\A404 /).nil?
     end
     
     def boolean_attr_or_error(tag, attribute_name, default)
