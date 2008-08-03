@@ -320,7 +320,7 @@ module StandardTags
     By default the @find@ attribute is set to @all@.
     
     *Usage:*
-    <pre><code><r:unless_content [part="part_name, other_part"] [inherit="true"] [find="any"]>...</r:unless_content></code></pre>
+    <pre><code><r:unless_content [part="part_name, other_part"] [inherit="false"] [find="any"]>...</r:unless_content></code></pre>
   }
   tag 'unless_content' do |tag|
     page = tag.locals.page
@@ -604,11 +604,11 @@ module StandardTags
     tag.expand
     options = tag.locals.random
     option = options[rand(options.size)]
-    option.call if option
+    option if option
   end
   tag 'random:option' do |tag|
     items = tag.locals.random
-    items << tag.block
+    items << tag.expand
   end
   
   desc %{  
